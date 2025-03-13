@@ -3,12 +3,22 @@ const express = require('express');
 const axios = require('axios');
 const {createServiceOnRender, createCustomDomainRequest, generateCNAMEPointer, generateCNAMEIdentifier, verifyDns} = require("./api")
 const {nanoid} = require("nanoid");
+const cors = require('cors');
 
 const app = express();
 const PORT = 4000;
 app.use(express.json());
+app.use(cors({
+    origin: '*', // Change * to specific domain for security
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
+app.options('*', cors());
 
 app.post("/", async (req, res) => {
+    console.log(req.body)
     try {
         const { customDomain, appUrl } = req.body;
         const serviceName = nanoid(12);
