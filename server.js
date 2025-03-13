@@ -22,7 +22,7 @@ app.post("/", async (req, res) => {
             return res.status(500).send({ error: "Service creation failed to return a valid service ID." });
         }
         createCustomDomainResponse = await createCustomDomainRequest(serviceId, customDomain);
-        if (createCustomDomainResponse !== null) {
+        if (createCustomDomainResponse !== null && serviceId && createCustomDomainResponse[0]?.id ) {
             response = {
                 cnamePointer: generateCNAMEPointer(serviceName),
                 cnameIdentifier: generateCNAMEIdentifier(customDomain),
@@ -30,16 +30,25 @@ app.post("/", async (req, res) => {
                 serviceId: serviceId,
                 customDomainId: createCustomDomainResponse[0].id
             };
+            res.status(201).json({
+                customDomain,
+                appUrl,
+                ...response,
+                createCustomDomainResponse,
+                serviceCreationResponse
+            });
+        } else {
+            res.status(11005).json({
+                customDomain,
+                appUrl,
+                ...response,
+                createCustomDomainResponse,
+                serviceCreationResponse
+            });
         }
     }
 
-    res.status(201).send({
-        customDomain,
-        appUrl,
-        ...response,
-        createCustomDomainResponse,
-        serviceCreationResponse
-    });
+
 });
 
 app.post("/verifyDns", async (req, res) => {
