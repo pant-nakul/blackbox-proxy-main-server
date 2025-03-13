@@ -95,6 +95,7 @@ module.exports = {
             .request(options)
             .then(res => response = res)
             .catch(err => console.error(err));
+        return response;
     }
 
 }

@@ -49,7 +49,7 @@ app.post("/", async (req, res) => {
 
 app.post("/verifyDns", async (req, res) => {
     const {serviceId,customDomainId} = req.body;
-    const response = verifyDns(serviceId,customDomainId)
+    const response = await verifyDns(serviceId,customDomainId)
     res.status(200).json({status: response.data})
 })
 
