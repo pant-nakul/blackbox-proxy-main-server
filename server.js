@@ -12,7 +12,6 @@ app.use(cors({
     origin: '*', // Change * to specific domain for security
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
 }));
 
 app.options('*', cors());
