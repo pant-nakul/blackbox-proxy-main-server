@@ -41,7 +41,6 @@ module.exports = {
 
         try {
             const res = await axios.request(options);
-            console.log("response received: ", res.data);
             // Assuming res.data contains the service object with property `service`
             return res.data;
         } catch (error) {
@@ -67,7 +66,6 @@ module.exports = {
 
         try {
             const res = await axios.request(options);
-            console.log("Custom domain response: ", res.data);
             return res.data;
         } catch (err) {
             console.error("Error occurred: ", err.response ? err.response.data : err.message);
@@ -93,8 +91,12 @@ module.exports = {
 
         await axios
             .request(options)
-            .then(res => response = res)
+            .then(res => {
+                console.log("Response received: ", res);
+                response = res
+            })
             .catch(err => console.error(err));
+        console.log("Response : ", response);
         return response;
     }
 

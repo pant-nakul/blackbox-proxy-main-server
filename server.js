@@ -11,16 +11,11 @@ app.use(express.json());
 app.post("/", async (req, res) => {
     const { customDomain, appUrl } = req.body;
     const serviceName = nanoid(12);
-
     // Create the service
     const serviceCreationResponse = await createServiceOnRender(appUrl, serviceName);
-    console.log("serviceCreationResponse", serviceCreationResponse);
-
     let createCustomDomainResponse = null;
     let response = {}; // Initialize as an empty object to safely spread later
-
     if (serviceCreationResponse !== null) {
-        // If the response object directly contains the service ID, use that.
         const serviceId = serviceCreationResponse.service && serviceCreationResponse.service.id;
         if (!serviceId) {
             console.error("Service ID is missing in the creation response");
@@ -50,7 +45,7 @@ app.post("/", async (req, res) => {
 app.post("/verifyDns", async (req, res) => {
     const {serviceId,customDomainId} = req.body;
     const response = await verifyDns(serviceId,customDomainId)
-    res.status(200).json({status: response.data})
+    res.status(200).json({status: response.status, statusText: response.statusText});
 })
 
 app.get("/", (req, res) => {
