@@ -9,46 +9,55 @@ const PORT = 4000;
 app.use(express.json());
 
 app.post("/", async (req, res) => {
-    const { customDomain, appUrl } = req.body;
-    const serviceName = nanoid(12);
-    // Create the service
-    const serviceCreationResponse = await createServiceOnRender(appUrl, serviceName);
-    let createCustomDomainResponse = null;
-    let response = {}; // Initialize as an empty object to safely spread later
-    if (serviceCreationResponse !== null) {
+    try {
+        const { customDomain, appUrl } = req.body;
+        const serviceName = nanoid(12);
+
+        // Create the service
+        const serviceCreationResponse = await createServiceOnRender(appUrl, serviceName);
+        let createCustomDomainResponse = null;
+        let responseData = {}; // Initialize as an empty object to safely spread later
+
+        if (serviceCreationResponse === null) {
+            return res.status(500).json({ error: "Service creation failed." });
+        }
+
         const serviceId = serviceCreationResponse.service && serviceCreationResponse.service.id;
         if (!serviceId) {
             console.error("Service ID is missing in the creation response");
-            return res.status(500).send({ error: "Service creation failed to return a valid service ID." });
+            return res.status(500).json({ error: "Service creation failed to return a valid service ID." });
         }
+
         createCustomDomainResponse = await createCustomDomainRequest(serviceId, customDomain);
-        if (createCustomDomainResponse !== null && serviceId && createCustomDomainResponse[0]?.id ) {
-            response = {
+        if (createCustomDomainResponse !== null && createCustomDomainResponse[0]?.id) {
+            responseData = {
                 cnamePointer: generateCNAMEPointer(serviceName),
                 cnameIdentifier: generateCNAMEIdentifier(customDomain),
                 serviceName: serviceName,
                 serviceId: serviceId,
                 customDomainId: createCustomDomainResponse[0].id
             };
-            res.status(201).json({
+            return res.status(201).json({
                 customDomain,
                 appUrl,
-                ...response,
+                ...responseData,
                 createCustomDomainResponse,
                 serviceCreationResponse
             });
         } else {
-            res.status(11005).json({
+            return res.status(400).json({
                 customDomain,
                 appUrl,
-                ...response,
+                ...responseData,
                 createCustomDomainResponse,
-                serviceCreationResponse
+                serviceCreationResponse,
+                error: "Custom domain creation failed."
             });
         }
+    } catch (error) {
+        console.error("Error in POST /:", error);
+        return res.status(500).json({ error: "Internal server error" });
     }
-
-
 });
 
 app.post("/verifyDns", async (req, res) => {
