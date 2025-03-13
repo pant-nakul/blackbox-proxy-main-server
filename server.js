@@ -1,9 +1,8 @@
 require('dotenv').config();
 const express = require('express');
-const axios = require('axios');
 const {createServiceOnRender, createCustomDomainRequest, generateCNAMEPointer, generateCNAMEIdentifier, verifyDns} = require("./api")
-const {nanoid} = require("nanoid");
 const cors = require('cors');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const PORT = 4000;
@@ -20,7 +19,7 @@ app.post("/", async (req, res) => {
     console.log(req.body)
     try {
         const { customDomain, appUrl } = req.body;
-        const serviceName = nanoid(12);
+        const serviceName = uuidv4();
 
         // Create the service
         const serviceCreationResponse = await createServiceOnRender(appUrl, serviceName);
@@ -40,7 +39,7 @@ app.post("/", async (req, res) => {
         createCustomDomainResponse = await createCustomDomainRequest(serviceId, customDomain);
         if (createCustomDomainResponse !== null && createCustomDomainResponse[0]?.id) {
             responseData = {
-                cnamePointer: generateCNAMEPointer(serviceName),
+                cnamePointer: serviceCreationResponse.service.serviceDetails.url,
                 cnameIdentifier: generateCNAMEIdentifier(customDomain),
                 serviceName: serviceName,
                 serviceId: serviceId,
