@@ -31,7 +31,7 @@ module.exports = {
                     plan: 'starter',
                     region: 'oregon',
                 },
-                envVars: [{ key: 'CUSTOM_URL', value: appUrl }],
+                envVars: [{ key: 'CUSTOM_URL', value: appUrl },{ key: 'PORT', value: 7777 }],
                 name: serviceName,
                 ownerId: process.env.RENDER_OWNER_ID,
                 repo: 'https://github.com/pant-nakul/blackbox-proxy-process',
