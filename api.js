@@ -111,6 +111,16 @@ module.exports = {
             .catch(err => console.error(err));
         console.log("Response : ", response);
         return response;
+    },
+      checkSubdomain:async(subdomain)=> {
+        try {
+            const result = await dns.lookup(subdomain);
+            console.log(`${subdomain} is active. Resolved IP:`, result.address);
+            return true;
+        } catch (error) {
+            console.error(`${subdomain} is not resolving. Error:`, error.message);
+            return false;
+        }
     }
 
 }
