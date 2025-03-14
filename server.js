@@ -23,7 +23,7 @@ app.post("/verify", async (req, res) => {
         console.log(req.body)
         const { domainName, cnamePointer } = req.body;
         console.log(domainName)
-        const isVerified = await verifyCname(domain, expectedCname);
+        const isVerified = await verifyCname(domainName, cnamePointer);
         console.log(isVerified ? "CNAME Verified!" : "Verification Failed.");
         if(isVerified) {
             res.status(200).json({ verified : true});

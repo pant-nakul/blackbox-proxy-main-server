@@ -1,5 +1,6 @@
 const axios = require("axios");
 const {nanoid} = require('nanoid');
+const dns = require("node:dns").promises;
 const token = process.env.RENDER_API_KEY;
 module.exports = {
     createServiceOnRender: async (appUrl, serviceName) => {
