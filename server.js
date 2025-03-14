@@ -3,6 +3,7 @@ const express = require('express');
 const {createServiceOnRender, createCustomDomainRequest, generateCNAMEPointer, generateCNAMEIdentifier, verifyDns} = require("./api")
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
+const {promises: dns} = require("dns");
 
 const app = express();
 const PORT = 4000;
@@ -14,6 +15,22 @@ app.use(cors({
 }));
 
 app.options('*', cors());
+
+app.post("/verify", async (req, res) => {
+    try {
+        console.log(req.body)
+        const { domainName, cnamePointer } = req.body;
+        console.log(domainName)
+        const records = await dns.resolveCname(domainName);
+        console.log(records)
+        const verified = records.includes(cnamePointer);
+        res.status(200).json({ verified });
+    } catch (error) {
+        console.error("DNS verification error:", error);
+        res.status(200).json({ verified: false });
+    }
+});
+
 
 app.post("/", async (req, res) => {
     console.log(req.body)
@@ -39,7 +56,7 @@ app.post("/", async (req, res) => {
         createCustomDomainResponse = await createCustomDomainRequest(serviceId, customDomain);
         if (createCustomDomainResponse !== null && createCustomDomainResponse[0]?.id) {
             responseData = {
-                cnamePointer: serviceCreationResponse.service.serviceDetails.url,
+                cnamePointer: serviceCreationResponse.service.serviceDetails.url.split("https://")[1],
                 cnameIdentifier: generateCNAMEIdentifier(customDomain),
                 serviceName: serviceName,
                 serviceId: serviceId,
