@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
-const {createServiceOnRender, createCustomDomainRequest, generateCNAMEPointer, generateCNAMEIdentifier, verifyDns} = require("./api")
+const {createServiceOnRender, createCustomDomainRequest, generateCNAMEPointer, generateCNAMEIdentifier, verifyDns,
+    verifyCname
+} = require("./api")
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const {promises: dns} = require("dns");
@@ -21,9 +23,9 @@ app.post("/verify", async (req, res) => {
         console.log(req.body)
         const { domainName, cnamePointer } = req.body;
         console.log(domainName)
-        const result = await dns.lookup(domainName);
-        console.log(result)
-        if(result) {
+        const isVerified = await verifyCname(domain, expectedCname);
+        console.log(isVerified ? "CNAME Verified!" : "Verification Failed.");
+        if(isVerified) {
             res.status(200).json({ verified : true});
         }else{
             res.status(200).json({ verified: false });

@@ -78,6 +78,18 @@ module.exports = {
     generateCNAMEIdentifier: (customDomainName) => {
         return customDomainName.split('.')[0];
     },
+    verifyCname: async( domainName, cnamePointer) =>{
+        try {
+            const cnameRecords = await dns.resolveCname(domainName);
+            console.log(`CNAME Records for ${domainName}:`, cnameRecords);
+            // Check if expected CNAME exists
+            return cnameRecords.includes(cnamePointer);
+        } catch (error) {
+            console.error("CNAME Lookup failed:", error);
+            return false;
+        }
+    }
+    ,
     verifyDns : async (serviceId,customDomainId) => {
         let response = null;
         const options = {
