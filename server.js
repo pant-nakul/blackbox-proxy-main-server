@@ -21,10 +21,13 @@ app.post("/verify", async (req, res) => {
         console.log(req.body)
         const { domainName, cnamePointer } = req.body;
         console.log(domainName)
-        const records = await dns.resolveCname(domainName);
-        console.log(records)
-        const verified = records.includes(cnamePointer);
-        res.status(200).json({ verified });
+        const result = await dns.lookup(domainName);
+        console.log(result)
+        if(result) {
+            res.status(200).json({ verified : true});
+        }else{
+            res.status(200).json({ verified: false });
+        }
     } catch (error) {
         console.error("DNS verification error:", error);
         res.status(200).json({ verified: false });
@@ -38,7 +41,6 @@ app.post("/", async (req, res) => {
         const { customDomain, appUrl } = req.body;
         const serviceName = uuidv4();
 
-        // Create the service
         const serviceCreationResponse = await createServiceOnRender(appUrl, serviceName);
         let createCustomDomainResponse = null;
         let responseData = {}; // Initialize as an empty object to safely spread later
@@ -94,10 +96,6 @@ app.post("/verifyDns", async (req, res) => {
 app.get("/", (req, res) => {
     res.send("Blackbox.ai reverse-proxy-server");
 })
-
-
-
-
 
 app.listen(PORT, () => {
     console.log(`Reverse proxy running on http://localhost:${PORT}`);

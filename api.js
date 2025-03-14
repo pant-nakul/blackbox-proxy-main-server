@@ -35,7 +35,7 @@ module.exports = {
                 name: serviceName,
                 ownerId: process.env.RENDER_OWNER_ID,
                 repo: 'https://github.com/pant-nakul/blackbox-proxy-process',
-                branch: 'master',
+                branch: 'revert',
             },
         };
 
